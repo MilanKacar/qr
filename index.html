@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rear Camera Video</title>
+    <title>Rear Camera Video - Try 1</title>
 
     <style>
         body {
@@ -50,6 +50,7 @@
     <!-- Display scanned content -->
     <div id="qr-content"></div>
 
+    <script src="https://cdn.rawgit.com/zxing-js/library@0.22.0/dist/zxing.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             // Access the user's camera with rear-facing preference
@@ -74,10 +75,11 @@
                     const tick = () => {
                         context.drawImage(video, 0, 0, canvas.width, canvas.height);
                         const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                        const code = jsQR(imageData.data, imageData.width, imageData.height);
+                        
+                        const code = window.zxing.readBarcode(imageData);
 
                         if (code) {
-                            qrContent.innerText = code.data;
+                            qrContent.innerText = code.text;
                             qrContent.style.display = 'block';
 
                             // Optionally, you can hide the content after a certain period
@@ -97,6 +99,5 @@
             });
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/jsqrcode/1.0.0/jsqrcode-combined.min.js"></script>
 </body>
 </html>
