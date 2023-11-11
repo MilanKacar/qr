@@ -3,75 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Scanner</title>
-    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
-    <style>
-        #result {
-            font-size: 18px;
-            margin-top: 20px;
-        }
-    </style>
+    <title>Camera and QR Code Scanner</title>
+    <script src="https://rawgit.com/zxing/zxing/master/instascan.min.js"></script>
 </head>
 <body>
-    <h1>QR Code Scanner</h1>
-    <label for="cameraSelection">Select Camera:</label>
-    <select id="cameraSelection"></select>
-    <br>
-    <video id="video" playsinline></video>
-    <div id="result"></div>
+    <h1>Camera and QR Code Scanner</h1>
+
+    <!-- Display video stream from the camera -->
+    <video id="preview" width="640" height="480" autoplay></video>
 
     <script>
-        const video = document.getElementById('video');
-        const resultDiv = document.getElementById('result');
-        const cameraSelection = document.getElementById('cameraSelection');
-
-        // Create a new Instascan scanner
-        const scanner = new Instascan.Scanner({ video: video });
-
-        // Add a listener for when a QR code is scanned
-        scanner.addListener('scan', function (content) {
-            resultDiv.innerText = 'Scanned: ' + content;
-        });
-
-        // Populate camera selection dropdown
-        Instascan.Camera.getCameras().then(function (cameras) {
-            const rearCameras = cameras.filter(isRearCamera);
-
-            rearCameras.forEach(function (camera, index) {
-                const option = document.createElement('option');
-                option.value = index;
-                option.text = camera.name || `Camera ${index + 1}`;
-                cameraSelection.add(option);
+        // Access the user's camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                document.getElementById('preview').srcObject = stream;
+            })
+            .catch(function (error) {
+                console.log('Error accessing camera: ', error);
             });
 
-            // Set default selected option
-            if (rearCameras.length > 0) {
-                cameraSelection.value = 0;
-                scanner.start(rearCameras[0]);
+        // Initialize QR code scanner
+        let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+        scanner.addListener('scan', function (content) {
+            alert('Scanned QR Code: ' + content);
+        });
+
+        // Get the list of available cameras and start scanning
+        Instascan.Camera.getCameras().then(function (cameras) {
+            if (cameras.length > 0) {
+                scanner.start(cameras[0]);
             } else {
-                console.error('No rear cameras found.');
+                console.error('No cameras found.');
             }
-        }).catch(function (e) {
-            console.error(e);
+        }).catch(function (error) {
+            console.error('Error accessing cameras: ', error);
         });
-
-        // Add change event listener to select the chosen camera
-        cameraSelection.addEventListener('change', function () {
-            const selectedCameraIndex = parseInt(cameraSelection.value, 10);
-            const selectedCamera = rearCameras[selectedCameraIndex];
-
-            if (selectedCamera) {
-                scanner.start(selectedCamera);
-            }
-        });
-
-        // Function to check if the camera is likely a rear-facing camera
-        function isRearCamera(camera) {
-            return !camera.label.toLowerCase().includes('front') &&
-                   !camera.label.toLowerCase().includes('selfie') &&
-                   !camera.label.toLowerCase().includes('user') &&
-                   !camera.label.toLowerCase().includes('environment');
-        }
     </script>
 </body>
 </html>
