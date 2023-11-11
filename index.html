@@ -37,7 +37,6 @@
             background-color: rgba(255, 255, 255, 0.8);
             padding: 10px;
             border-radius: 10px;
-            display: none;
         }
     </style>
 </head>
@@ -47,7 +46,7 @@
         <video id="preview" autoplay playsinline></video>
     </div>
 
-    <!-- Display scanned content -->
+    <!-- Display scanned content and debug information -->
     <div id="qr-content"></div>
 
     <script src="https://cdn.rawgit.com/zxing-js/library@0.22.0/dist/zxing.min.js"></script>
@@ -79,13 +78,16 @@
                         const code = window.zxing.readBarcode(imageData);
 
                         if (code) {
-                            qrContent.innerText = code.text;
-                            qrContent.style.display = 'block';
+                            // Display scanned content
+                            qrContent.innerText = `Scanned Content: ${code.text}`;
 
                             // Optionally, you can hide the content after a certain period
                             setTimeout(() => {
-                                qrContent.style.display = 'none';
+                                qrContent.innerText = ''; // Clear the content
                             }, 5000); // Display for 5 seconds
+                        } else {
+                            // Display debug information
+                            qrContent.innerText = 'No QR code detected.';
                         }
 
                         requestAnimationFrame(tick);
@@ -95,7 +97,7 @@
                 });
             })
             .catch(function (error) {
-                console.log('Error accessing rear camera: ', error);
+                console.error('Error accessing rear camera: ', error);
             });
         });
     </script>
