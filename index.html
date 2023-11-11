@@ -31,7 +31,7 @@
 
         #qr-content {
             position: fixed;
-            top: 10px;
+            bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
             background-color: rgba(255, 255, 255, 0.8);
@@ -46,10 +46,10 @@
         <video id="preview" autoplay playsinline></video>
     </div>
 
-    <!-- Display scanned content and debug information -->
+    <!-- Display scanned content and debug information at the bottom -->
     <div id="qr-content"></div>
 
-    <script src="https://cdn.rawgit.com/zxing-js/library@0.22.0/dist/zxing.min.js"></script>
+    <script src="https://cdn.rawgit.com/serratus/quaggaJS/0.12.1/dist/quagga.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             // Access the user's camera with rear-facing preference
@@ -62,44 +62,46 @@
                 document.getElementById('preview').srcObject = stream;
 
                 // Initialize QR code scanner
-                const video = document.getElementById('preview');
-                const qrContent = document.getElementById('qr-content');
+                Quagga.init({
+                    inputStream: {
+                        name: "Live",
+                        type: "LiveStream",
+                        target: document.getElementById("preview"),
+                    },
+                    locator: {
+                        patchSize: "medium",
+                        halfSample: false,
+                    },
+                    numOfWorkers: navigator.hardwareConcurrency,
+                    decoder: {
+                        readers: ["qrcode_reader"],
+                    },
+                    locate: true,
+                }, function (err) {
+                    if (err) {
+                        console.error('Error initializing Quagga:', err);
+                        return;
+                    }
+                    Quagga.start();
+                });
 
-                video.addEventListener('play', () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    const context = canvas.getContext('2d');
+                // Register callback for successful decoding
+                Quagga.onDetected(function (result) {
+                    const qrContent = document.getElementById('qr-content');
 
-                    const tick = () => {
-                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                    // Display scanned content
+                    qrContent.innerText = `Scanned Content: ${result.codeResult.code}`;
 
-                        const code = window.zxing.readBarcode(imageData);
+                    // Optionally, check if the scanned content is a link
+                    if (result.codeResult.code.toLowerCase().startsWith('http') || result.codeResult.code.toLowerCase().startsWith('https')) {
+                        // Redirect to the scanned link
+                        window.location.href = result.codeResult.code;
+                    }
 
-                        if (code) {
-                            // Display scanned content
-                            qrContent.innerText = `Scanned Content: ${code.text}`;
-
-                            // Optionally, check if the scanned content is a link
-                            if (code.text.toLowerCase().startsWith('http') || code.text.toLowerCase().startsWith('https')) {
-                                // Redirect to the scanned link
-                                window.location.href = code.text;
-                            }
-
-                            // Optionally, you can hide the content after a certain period
-                            setTimeout(() => {
-                                qrContent.innerText = ''; // Clear the content
-                            }, 5000); // Display for 5 seconds
-                        } else {
-                            // Display debug information
-                            qrContent.innerText = 'No QR code detected.';
-                        }
-
-                        requestAnimationFrame(tick);
-                    };
-
-                    tick();
+                    // Optionally, you can hide the content after a certain period
+                    setTimeout(() => {
+                        qrContent.innerText = ''; // Clear the content
+                    }, 5000); // Display for 5 seconds
                 });
             })
             .catch(function (error) {
