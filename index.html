@@ -35,7 +35,7 @@
 
         // Populate camera selection dropdown
         Instascan.Camera.getCameras().then(function (cameras) {
-            const rearCameras = cameras.filter(camera => !(camera.name.toLowerCase().includes('front') || camera.label.toLowerCase().includes('front')));
+            const rearCameras = cameras.filter(isRearCamera);
 
             rearCameras.forEach(function (camera, index) {
                 const option = document.createElement('option');
@@ -64,6 +64,14 @@
                 scanner.start(selectedCamera);
             }
         });
+
+        // Function to check if the camera is likely a rear-facing camera
+        function isRearCamera(camera) {
+            return !camera.label.toLowerCase().includes('front') &&
+                   !camera.label.toLowerCase().includes('selfie') &&
+                   !camera.label.toLowerCase().includes('user') &&
+                   !camera.label.toLowerCase().includes('environment');
+        }
     </script>
 </body>
 </html>
