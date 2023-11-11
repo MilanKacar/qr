@@ -3,26 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rear Camera Video</title>
+    <title>1 Rear Camera Video</title>
 </head>
 <body>
     <h1>Rear Camera Video</h1>
 
     <!-- Display video stream from the rear camera -->
-    <video id="preview" width="640" height="480" autoplay></video>
+    <video id="preview" width="640" height="480" autoplay playsinline></video>
 
     <script>
-        // Access the user's camera with rear-facing preference
-        navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: { exact: 'environment' }
-            }
-        })
-        .then(function (stream) {
-            document.getElementById('preview').srcObject = stream;
-        })
-        .catch(function (error) {
-            console.log('Error accessing rear camera: ', error);
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Access the user's camera with rear-facing preference
+            navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: { exact: 'environment' }
+                }
+            })
+            .then(function (stream) {
+                document.getElementById('preview').srcObject = stream;
+            })
+            .catch(function (error) {
+                console.log('Error accessing rear camera: ', error);
+            });
         });
     </script>
 </body>
