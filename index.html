@@ -41,7 +41,7 @@
     <div id="preview-container">
         <video id="preview" autoplay playsinline></video>
     </div>
-
+    <div id="reader"></div>
 
     <script src="https://raw.githubusercontent.com/mebjas/html5-qrcode/master/minified/html5-qrcode.min.js"></script>
 
@@ -56,30 +56,30 @@
             .then(function (stream) {
                 document.getElementById('preview').srcObject = stream;
 
-                // Initialize QR code scanner
+                // Create instance of the object. The only argument is the "id" of HTML element created above.
                 const html5QrCode = new Html5Qrcode("reader");
-
-                // Register callback for successful decoding
+                
                 html5QrCode.start(
-                    { fps: 10, qrbox: 250 },
-                    qrCodeMessage => {
-                        const qrContent = document.getElementById('qr-content');
-
-                        // Display scanned content
-                        qrContent.innerText = `Scanned Content: ${qrCodeMessage}`;
-
-                        // Check if the scanned content is a link
-                        if (qrCodeMessage.toLowerCase().startsWith('http') || qrCodeMessage.toLowerCase().startsWith('https')) {
-                            // Redirect to the scanned link
-                            window.location.href = qrCodeMessage;
-                        }
-                    },
-                    errorMessage => {
-                        // Display error information
-                        console.error(`Error scanning QR code. Reason: ${errorMessage}`);
-                    }
-                );
-            })
+                  cameraId,     // retreived in the previous step.
+                  {
+                    fps: 10,    // sets the framerate to 10 frame per second
+                    qrbox: 250  // sets only 250 X 250 region of viewfinder to
+                                // scannable, rest shaded.
+                  },
+                  qrCodeMessage => {
+                    // do something when code is read. For example:
+                    console.log(`QR Code detected: ${qrCodeMessage}`);
+                    window.location.href = qrCodeMessage;
+                  },
+                  errorMessage => {
+                    // parse error, ideally ignore it. For example:
+                    console.log(`QR Code no longer in front of camera.`);
+                  })
+                .catch(err => {
+                  // Start failed, handle it. For example,
+                  console.log(`Unable to start scanning, error: ${err}`);
+                });
+                            })
             .catch(function (error) {
                 console.error('Error accessing rear camera: ', error);
             });
