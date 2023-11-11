@@ -12,19 +12,54 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            background: linear-gradient(to bottom, #add8e6, #87cefa); /* Light blue gradient background */
+        }
+
+        #preview-container {
+            position: relative;
+            width: 100%;
+            max-width: calc(100vw - 60px); /* Set maximum width with padding */
+            border-radius: 20px; /* Increased border radius */
+            overflow: hidden; /* Hide overflow content (e.g., rounded corners) */
         }
 
         #preview {
             width: 100%;
-            max-width: calc(100vw - 60px); /* Set maximum width with padding */
-            border-radius: 10px; /* Add rounded corners */
+            height: 100%;
+            object-fit: cover; /* Maintain aspect ratio and cover entire container */
+        }
+
+        #qr-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #qr-overlay img {
+            width: 80%;
+            max-width: 300px;
+            border: 5px solid #fff;
+            border-radius: 10px;
         }
     </style>
 </head>
 <body>
     <!-- Display video stream from the rear camera -->
-    <video id="preview" autoplay playsinline></video>
+    <div id="preview-container">
+        <video id="preview" autoplay playsinline></video>
+        <!-- QR code scanner overlay -->
+        <div id="qr-overlay">
+            <img src="https://via.placeholder.com/300" alt="QR Code Scanner" />
+            <!-- Replace the placeholder image with your QR code scanner image -->
+        </div>
+    </div>
 
+    <script src="https://rawgit.com/zxing/zxing/master/instascan.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             // Access the user's camera with rear-facing preference
@@ -35,6 +70,24 @@
             })
             .then(function (stream) {
                 document.getElementById('preview').srcObject = stream;
+
+                // Initialize QR code scanner
+                let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+                scanner.addListener('scan', function (content) {
+                    // Redirect to the scanned URL
+                    window.location.href = content;
+                });
+
+                // Get the list of available cameras and start scanning
+                Instascan.Camera.getCameras().then(function (cameras) {
+                    if (cameras.length > 0) {
+                        scanner.start(cameras[0]);
+                    } else {
+                        console.error('No cameras found.');
+                    }
+                }).catch(function (error) {
+                    console.error('Error accessing cameras: ', error);
+                });
             })
             .catch(function (error) {
                 console.log('Error accessing rear camera: ', error);
