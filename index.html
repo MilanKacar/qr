@@ -50,7 +50,6 @@
     <!-- Display scanned content -->
     <div id="qr-content"></div>
 
-    <script src="https://rawgit.com/zxing/zxing/master/instascan.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             // Access the user's camera with rear-facing preference
@@ -63,27 +62,34 @@
                 document.getElementById('preview').srcObject = stream;
 
                 // Initialize QR code scanner
-                let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-                scanner.addListener('scan', function (content) {
-                    // Display the scanned content on the page
-                    document.getElementById('qr-content').innerText = content;
-                    document.getElementById('qr-content').style.display = 'block';
+                const video = document.getElementById('preview');
+                const qrContent = document.getElementById('qr-content');
 
-                    // Optionally, you can hide the content after a certain period
-                    setTimeout(function () {
-                        document.getElementById('qr-content').style.display = 'none';
-                    }, 5000); // Display for 5 seconds
-                });
+                video.addEventListener('play', () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const context = canvas.getContext('2d');
 
-                // Get the list of available cameras and start scanning
-                Instascan.Camera.getCameras().then(function (cameras) {
-                    if (cameras.length > 0) {
-                        scanner.start(cameras[0]);
-                    } else {
-                        console.error('No cameras found.');
-                    }
-                }).catch(function (error) {
-                    console.error('Error accessing cameras: ', error);
+                    const tick = () => {
+                        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                        const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                        if (code) {
+                            qrContent.innerText = code.data;
+                            qrContent.style.display = 'block';
+
+                            // Optionally, you can hide the content after a certain period
+                            setTimeout(() => {
+                                qrContent.style.display = 'none';
+                            }, 5000); // Display for 5 seconds
+                        }
+
+                        requestAnimationFrame(tick);
+                    };
+
+                    tick();
                 });
             })
             .catch(function (error) {
@@ -91,5 +97,6 @@
             });
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/jsqrcode/1.0.0/jsqrcode-combined.min.js"></script>
 </body>
 </html>
