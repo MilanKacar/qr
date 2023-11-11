@@ -3,40 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camera and QR Code Scanner</title>
+    <title>Rear Camera and QR Code Scanner</title>
     <script src="https://rawgit.com/zxing/zxing/master/instascan.min.js"></script>
 </head>
 <body>
-    <h1>Camera and QR Code Scanner</h1>
+    <h1>Rear Camera and QR Code Scanner</h1>
 
-    <!-- Display video stream from the camera -->
+    <!-- Display video stream from the rear camera -->
     <video id="preview" width="640" height="480" autoplay></video>
 
     <script>
-        // Access the user's camera
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function (stream) {
-                document.getElementById('preview').srcObject = stream;
-            })
-            .catch(function (error) {
-                console.log('Error accessing camera: ', error);
+        // Access the user's camera with rear-facing preference
+        navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: { exact: 'environment' }
+            }
+        })
+        .then(function (stream) {
+            document.getElementById('preview').srcObject = stream;
+
+            // Initialize QR code scanner
+            let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+            scanner.addListener('scan', function (content) {
+                alert('Scanned QR Code: ' + content);
             });
 
-        // Initialize QR code scanner
-        let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-        scanner.addListener('scan', function (content) {
-            alert('Scanned QR Code: ' + content);
-        });
-
-        // Get the list of available cameras and start scanning
-        Instascan.Camera.getCameras().then(function (cameras) {
-            if (cameras.length > 0) {
-                scanner.start(cameras[0]);
-            } else {
-                console.error('No cameras found.');
-            }
-        }).catch(function (error) {
-            console.error('Error accessing cameras: ', error);
+            // Get the list of available cameras and start scanning
+            Instascan.Camera.getCameras().then(function (cameras) {
+                if (cameras.length > 0) {
+                    scanner.start(cameras[0]);
+                } else {
+                    console.error('No cameras found.');
+                }
+            }).catch(function (error) {
+                console.error('Error accessing cameras: ', error);
+            });
+        })
+        .catch(function (error) {
+            console.log('Error accessing rear camera: ', error);
         });
     </script>
 </body>
