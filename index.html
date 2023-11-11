@@ -74,12 +74,18 @@
                     const tick = () => {
                         context.drawImage(video, 0, 0, canvas.width, canvas.height);
                         const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-                        
+
                         const code = window.zxing.readBarcode(imageData);
 
                         if (code) {
                             // Display scanned content
                             qrContent.innerText = `Scanned Content: ${code.text}`;
+
+                            // Optionally, check if the scanned content is a link
+                            if (code.text.toLowerCase().startsWith('http') || code.text.toLowerCase().startsWith('https')) {
+                                // Redirect to the scanned link
+                                window.location.href = code.text;
+                            }
 
                             // Optionally, you can hide the content after a certain period
                             setTimeout(() => {
