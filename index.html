@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rear Camera Video - Try 1</title>
+    <title>QR Code Scanner</title>
 
     <style>
         body {
@@ -15,99 +15,68 @@
             background: linear-gradient(to bottom, #add8e6, #87cefa); /* Light blue gradient background */
         }
 
-        #preview-container {
-            position: relative;
-            width: 100%;
-            max-width: calc(100vw - 60px); /* Set maximum width with padding */
-            border-radius: 20px; /* Increased border radius */
-            overflow: hidden; /* Hide overflow content (e.g., rounded corners) */
-        }
-
-        #preview {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* Maintain aspect ratio and cover entire container */
-        }
-
-        #qr-content {
-            position: fixed;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 10px;
+        #reader {
+            width: 300px;
+            height: 300px;
+            background-color: #fff;
+            border: 2px solid #333;
             border-radius: 10px;
+            overflow: hidden;
         }
     </style>
 </head>
 <body>
-    <!-- Display video stream from the rear camera -->
-    <div id="preview-container">
-        <video id="preview" autoplay playsinline></video>
-    </div>
+    <!-- Placeholder element for the QR code scanner -->
+    <div id="reader"></div>
 
-    <!-- Display scanned content and debug information at the bottom -->
-    <div id="qr-content"></div>
+    <!-- File input for scanning QR codes from images -->
+    <input type="file" id="qr-input-file" accept="image/*">
 
-    <script src="https://cdn.rawgit.com/serratus/quaggaJS/0.12.1/dist/quagga.min.js"></script>
+    <script src="https://raw.githubusercontent.com/mebjas/html5-qrcode/master/minified/html5-qrcode.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            // Access the user's camera with rear-facing preference
-            navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: { exact: 'environment' }
-                }
+        // Initialize html5-qrcode
+        const html5QrCode = new Html5Qrcode("reader");
+
+        // File based scanning
+        const fileInput = document.getElementById('qr-input-file');
+        fileInput.addEventListener('change', e => {
+            if (e.target.files.length == 0) {
+                // No file selected, ignore 
+                return;
+            }
+
+            // Use the first item in the list
+            const imageFile = e.target.files[0];
+            html5QrCode.scanFile(imageFile, true)
+            .then(qrCodeMessage => {
+                // success, use qrCodeMessage
+                console.log(qrCodeMessage);
+                alert(`Scanned Content: ${qrCodeMessage}`);
             })
-            .then(function (stream) {
-                document.getElementById('preview').srcObject = stream;
-
-                // Initialize QR code scanner
-                Quagga.init({
-                    inputStream: {
-                        name: "Live",
-                        type: "LiveStream",
-                        target: document.getElementById("preview"),
-                    },
-                    locator: {
-                        patchSize: "medium",
-                        halfSample: false,
-                    },
-                    numOfWorkers: navigator.hardwareConcurrency,
-                    decoder: {
-                        readers: ["qrcode_reader"],
-                    },
-                    locate: true,
-                }, function (err) {
-                    if (err) {
-                        console.error('Error initializing Quagga:', err);
-                        return;
-                    }
-                    Quagga.start();
-                });
-
-                // Register callback for successful decoding
-                Quagga.onDetected(function (result) {
-                    const qrContent = document.getElementById('qr-content');
-
-                    // Display scanned content
-                    qrContent.innerText = `Scanned Content: ${result.codeResult.code}`;
-
-                    // Optionally, check if the scanned content is a link
-                    if (result.codeResult.code.toLowerCase().startsWith('http') || result.codeResult.code.toLowerCase().startsWith('https')) {
-                        // Redirect to the scanned link
-                        window.location.href = result.codeResult.code;
-                    }
-
-                    // Optionally, you can hide the content after a certain period
-                    setTimeout(() => {
-                        qrContent.innerText = ''; // Clear the content
-                    }, 5000); // Display for 5 seconds
-                });
-            })
-            .catch(function (error) {
-                console.error('Error accessing rear camera: ', error);
+            .catch(err => {
+                // failure, handle it.
+                console.error(`Error scanning file. Reason: ${err}`);
+                alert(`Error scanning file. Reason: ${err}`);
             });
         });
+
+        // Start live scanning
+        html5QrCode.start(
+            { fps: 10 },
+            {
+                qrbox: 250,
+            },
+            qrCodeMessage => {
+                // Success callback for live scanning
+                console.log(`Live Scanned Content: ${qrCodeMessage}`);
+                alert(`Live Scanned Content: ${qrCodeMessage}`);
+            },
+            errorMessage => {
+                // Error callback for live scanning
+                console.error(`Live Scanning Error: ${errorMessage}`);
+                alert(`Live Scanning Error: ${errorMessage}`);
+            }
+        );
     </script>
 </body>
 </html>
