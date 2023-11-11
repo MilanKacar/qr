@@ -14,31 +14,50 @@
 </head>
 <body>
     <h1>QR Code Scanner</h1>
+    <label for="cameraSelection">Select Camera:</label>
+    <select id="cameraSelection"></select>
+    <br>
     <video id="video" playsinline></video>
     <div id="result"></div>
 
     <script>
         const video = document.getElementById('video');
         const resultDiv = document.getElementById('result');
+        const cameraSelection = document.getElementById('cameraSelection');
 
         // Create a new Instascan scanner
         const scanner = new Instascan.Scanner({ video: video });
 
-        // Add a listener for when a QR code is scanned
-        scanner.addListener('scan', function (content) {
-            resultDiv.innerText = 'Scanned: ' + content;
-        });
-
-        // Start the camera
+        // Populate camera selection dropdown
         Instascan.Camera.getCameras().then(function (cameras) {
+            cameras.forEach(function (camera, index) {
+                const option = document.createElement('option');
+                option.value = index;
+                option.text = camera.name || `Camera ${index + 1}`;
+                cameraSelection.add(option);
+            });
+
+            // Set default selected option
             if (cameras.length > 0) {
-                console.log(cameras)
-                scanner.start(cameras[0]);
-            } else {
-                console.error('No cameras found.');
+                cameraSelection.value = 0;
             }
         }).catch(function (e) {
             console.error(e);
+        });
+
+        // Add change event listener to select the chosen camera
+        cameraSelection.addEventListener('change', function () {
+            const selectedCameraIndex = parseInt(cameraSelection.value, 10);
+            const selectedCamera = cameras[selectedCameraIndex];
+
+            if (selectedCamera) {
+                scanner.start(selectedCamera);
+            }
+        });
+
+        // Add a listener for when a QR code is scanned
+        scanner.addListener('scan', function (content) {
+            resultDiv.innerText = 'Scanned: ' + content;
         });
     </script>
 </body>
