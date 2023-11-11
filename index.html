@@ -29,10 +29,14 @@
             resultDiv.innerText = 'Scanned: ' + content;
         });
 
-        // Start the camera
+        // Start the camera with rear-facing preference
         Instascan.Camera.getCameras().then(function (cameras) {
-            if (cameras.length > 0) {
-                scanner.start(cameras[1]);
+            const rearCamera = cameras.find(camera => camera.name.toLowerCase().includes('back') || camera.label.toLowerCase().includes('back'));
+
+            if (rearCamera) {
+                scanner.start(rearCamera);
+            } else if (cameras.length > 0) {
+                scanner.start(cameras[0]);
             } else {
                 console.error('No cameras found.');
             }
