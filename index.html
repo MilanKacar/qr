@@ -43,8 +43,18 @@
         #qr-overlay img {
             width: 80%;
             max-width: 300px;
-            border: 5px solid #fff;
             border-radius: 10px;
+        }
+
+        #qr-content {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            display: none;
         }
     </style>
 </head>
@@ -54,10 +64,13 @@
         <video id="preview" autoplay playsinline></video>
         <!-- QR code scanner overlay -->
         <div id="qr-overlay">
-            <img src="https://via.placeholder.com/300" alt="QR Code Scanner" />
-            <!-- Replace the placeholder image with your QR code scanner image -->
+            <img src="path/to/transparent-qr-code.png" alt="QR Code Scanner" />
+            <!-- Replace the path with the correct path to your transparent QR code image -->
         </div>
     </div>
+
+    <!-- Display scanned content -->
+    <div id="qr-content"></div>
 
     <script src="https://rawgit.com/zxing/zxing/master/instascan.min.js"></script>
     <script>
@@ -74,8 +87,14 @@
                 // Initialize QR code scanner
                 let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
                 scanner.addListener('scan', function (content) {
-                    // Redirect to the scanned URL
-                    window.location.href = content;
+                    // Display the scanned content on the page
+                    document.getElementById('qr-content').innerText = content;
+                    document.getElementById('qr-content').style.display = 'block';
+
+                    // Optionally, you can hide the content after a certain period
+                    setTimeout(function () {
+                        document.getElementById('qr-content').style.display = 'none';
+                    }, 5000); // Display for 5 seconds
                 });
 
                 // Get the list of available cameras and start scanning
