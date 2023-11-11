@@ -76,11 +76,6 @@
                             // Redirect to the scanned link
                             window.location.href = qrCodeMessage;
                         }
-
-                        // Optionally, you can hide the content after a certain period
-                        setTimeout(() => {
-                            qrContent.innerText = ''; // Clear the content
-                        }, 5000); // Display for 5 seconds
                     },
                     errorMessage => {
                         // Display error information
