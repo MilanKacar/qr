@@ -3,13 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1 Rear Camera Video</title>
+    <title>Rear Camera Video</title>
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #preview {
+            width: 100%; /* Make the video fill the container */
+            max-width: 640px; /* Set a maximum width to prevent it from becoming too large */
+        }
+    </style>
 </head>
 <body>
-    <h1>1 Rear Camera Video</h1>
-
     <!-- Display video stream from the rear camera -->
-    <video id="preview" width="640" height="480" autoplay playsinline></video>
+    <video id="preview" autoplay playsinline></video>
 
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
