@@ -16,7 +16,8 @@
         }
 
         #reader {
-            width: 300px;
+            width: 100%;
+            max-width: 300px;
             height: 300px;
             background-color: #fff;
             border: 2px solid #333;
@@ -29,36 +30,10 @@
     <!-- Placeholder element for the QR code scanner -->
     <div id="reader"></div>
 
-    <!-- File input for scanning QR codes from images -->
-    <input type="file" id="qr-input-file" accept="image/*">
-
     <script src="https://raw.githubusercontent.com/mebjas/html5-qrcode/master/minified/html5-qrcode.min.js"></script>
     <script>
         // Initialize html5-qrcode
         const html5QrCode = new Html5Qrcode("reader");
-
-        // File based scanning
-        const fileInput = document.getElementById('qr-input-file');
-        fileInput.addEventListener('change', e => {
-            if (e.target.files.length == 0) {
-                // No file selected, ignore 
-                return;
-            }
-
-            // Use the first item in the list
-            const imageFile = e.target.files[0];
-            html5QrCode.scanFile(imageFile, true)
-            .then(qrCodeMessage => {
-                // success, use qrCodeMessage
-                console.log(qrCodeMessage);
-                alert(`Scanned Content: ${qrCodeMessage}`);
-            })
-            .catch(err => {
-                // failure, handle it.
-                console.error(`Error scanning file. Reason: ${err}`);
-                alert(`Error scanning file. Reason: ${err}`);
-            });
-        });
 
         // Start live scanning
         html5QrCode.start(
