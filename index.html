@@ -30,7 +30,7 @@
             // Handle scan failure (optional)
         }
 
-        let html5QrcodeScanner = new Html5Qrcode("qr-reader", { formatsToSupport: [ 0 ] });
+        let html5QrcodeScanner = new Html5Qrcode("qr-reader");
         html5QrcodeScanner.start(
             { facingMode: "environment" }, // Use the rear-facing camera
             {
