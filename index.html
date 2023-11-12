@@ -20,30 +20,47 @@
 </head>
 <body>
     <div id="qr-reader"></div>
-
     <script>
+        let html5QrcodeScanner;
+
         function onScanSuccess(decodedText, decodedResult) {
             alert(`Scanned text: ${decodedText}`);
-            window.location.reload();
+            resetScanner();
         }
 
         function onScanFailure(error) {
-            // Handle scan failure
             console.error(`QR Code scanning failed: ${error}`);
         }
 
-        let html5QrcodeScanner = new Html5Qrcode("qr-reader");
-        html5QrcodeScanner.start(
-            { facingMode: "environment" },
-            {
-                fps: 10,
-                qrbox: window.innerWidth > window.innerHeight ? { width: window.innerHeight, height: window.innerHeight } : { width: window.innerWidth, height: window.innerWidth }
-            },
-            onScanSuccess,
-            onScanFailure
-        ).catch(err => {
-            console.error(`Error starting QR scanner: ${err}`);
-        });
+        function resetScanner() {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear().then(() => {
+                    startScanner();
+                }).catch(err => {
+                    console.error(`Failed to clear the QR Scanner: ${err}`);
+                });
+            }
+        }
+
+        function startScanner() {
+            html5QrcodeScanner = new Html5Qrcode("qr-reader");
+            html5QrcodeScanner.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: window.innerWidth > window.innerHeight ? 
+                        { width: window.innerHeight, height: window.innerHeight } : 
+                        { width: window.innerWidth, height: window.innerWidth }
+                },
+                onScanSuccess,
+                onScanFailure
+            ).catch(err => {
+                console.error(`Error starting QR scanner: ${err}`);
+            });
+        }
+
+        // Initialize scanner on page load
+        window.addEventListener('load', startScanner);
     </script>
 </body>
 </html>
