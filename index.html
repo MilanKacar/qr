@@ -5,36 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Scanner</title>
 
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(to bottom, #add8e6, #87cefa); /* Light blue gradient background */
-        }
-
-        #preview-container {
-            position: relative;
-            width: 100%;
-            max-width: 300px;
-            height: 300px;
-            overflow: hidden;
-        }
-
-        #qr-content {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            border-radius: 10px;
-            white-space: pre-line;
-            border-redius: 40px;
-        }
-    </style>
 </head>
 <body>
     <!-- Display video stream from the rear camera -->
@@ -43,60 +13,68 @@
     </div>
     <div id="reader"></div>
 
-    <script src="https://raw.githubusercontent.com/mebjas/html5-qrcode/master/minified/html5-qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js" integrity="sha512-k/KAe4Yff9EUdYI5/IAHlwUswqeipP+Cp5qnrsUjTPCgl51La2/JhyyjNciztD7mWNKLSXci48m7cctATKfLlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+
+    <style>
+        main {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #reader {
+            width: 600px;
+        }
+        #result {
+            text-align: center;
+            font-size: 1.5rem;
+        }
+    </style>
+    
+    <main>
+        <div id="reader"></div>
+        <div id="result"></div>
+    </main>
+        
+    
     <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            // Access the user's camera with rear-facing preference
-            navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: { exact: 'environment' }
-                }
-            })
-            .then(function (stream) {
-                document.getElementById('preview').srcObject = stream;
-
-                Html5Qrcode.getCameras().then(devices => {
-                  /**
-                   * devices would be an array of objects of type:
-                   * { id: "id", label: "label" }
-                   */
-                  if (devices && devices.length) {
-                    var cameraId = devices[0].id;
-                    // .. use this to start scanning.
-                  }
-                }).catch(err => {
-                  // handle err
-                });
-
-                // Create instance of the object. The only argument is the "id" of HTML element created above.
-                const html5QrCode = new Html5Qrcode("reader");
-                
-                html5QrCode.start(
-                  cameraId,     // retreived in the previous step.
-                  {
-                    fps: 10,    // sets the framerate to 10 frame per second
-                    qrbox: 250  // sets only 250 X 250 region of viewfinder to
-                                // scannable, rest shaded.
-                  },
-                  qrCodeMessage => {
-                    // do something when code is read. For example:
-                    console.log(`QR Code detected: ${qrCodeMessage}`);
-                    window.location.href = qrCodeMessage;
-                  },
-                  errorMessage => {
-                    // parse error, ideally ignore it. For example:
-                    console.log(`QR Code no longer in front of camera.`);
-                  })
-                .catch(err => {
-                  // Start failed, handle it. For example,
-                  console.log(`Unable to start scanning, error: ${err}`);
-                });
-                            })
-            .catch(function (error) {
-                console.error('Error accessing rear camera: ', error);
-            });
+    
+        const scanner = new Html5QrcodeScanner('reader', { 
+            // Scanner will be initialized in DOM inside element with id of 'reader'
+            qrbox: {
+                width: 250,
+                height: 250,
+            },  // Sets dimensions of scanning box (set relative to reader element width)
+            fps: 20, // Frames per second to attempt a scan
         });
+    
+    
+        scanner.render(success, error);
+        // Starts scanner
+    
+        function success(result) {
+    
+            document.getElementById('result').innerHTML = `
+            <h2>Success!</h2>
+            <p><a href="${result}">${result}</a></p>
+            `;
+            // Prints result as a link inside result element
+    
+            scanner.clear();
+            // Clears scanning instance
+    
+            document.getElementById('reader').remove();
+            // Removes reader element from DOM since no longer needed
+        
+        }
+    
+        function error(err) {
+            console.error(err);
+            // Prints any errors to the console
+        }
+    
+    </script>
+
     </script>
 </body>
 </html>
