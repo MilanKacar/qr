@@ -36,10 +36,14 @@
     </div>
     <script>
         let html5QrcodeScanner;
+        let scanningEnabled = true; // Flag to control scanning
 
         function onScanSuccess(decodedText, decodedResult) {
-            // Redirect to the scanned URL
-            window.location.href = decodedText;
+            if (scanningEnabled) {
+                scanningEnabled = false; // Disable further scanning
+                // Redirect to the scanned URL
+                window.location.href = decodedText;
+            }
         }
 
         function onScanFailure(error) {
