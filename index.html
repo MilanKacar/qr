@@ -24,8 +24,8 @@
         let html5QrcodeScanner;
 
         function onScanSuccess(decodedText, decodedResult) {
-            alert(`Scanned text: ${decodedText}`);
-            resetScanner();
+            // Redirect to the scanned URL
+            window.location.href = decodedText;
         }
 
         function onScanFailure(error) {
