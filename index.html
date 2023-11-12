@@ -8,15 +8,23 @@
 
     <script>
         function onScanSuccess(decodedText, decodedResult) {
-            // Handle the decoded text.
             alert(`Scanned text: ${decodedText}`);
-            // Stop scanning once the code is scanned.
             html5QrcodeScanner.clear();
         }
 
-        let html5QrcodeScanner = new Html5QrcodeScanner(
-            "qr-reader", { fps: 10, qrbox: 250 });
-        html5QrcodeScanner.render(onScanSuccess);
+        function onScanFailure(error) {
+            // Handle scan failure (optional)
+        }
+
+        let html5QrcodeScanner = new Html5Qrcode("qr-reader");
+        html5QrcodeScanner.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: 250 },
+            onScanSuccess,
+            onScanFailure
+        ).catch(err => {
+            console.error(err);
+        });
     </script>
 </body>
 </html>
