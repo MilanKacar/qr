@@ -9,13 +9,22 @@
             height: 100%;
             width: 100%;
             overflow: hidden;
-            background-color: transparent; /* Set the background-color to transparent */
+            background-color: #000;
         }
         #qr-reader {
             width: 100%;
             height: 100%;
             position: relative;
-            background-color: transparent; /* Set the background-color to transparent */
+        }
+        #qr-box-overlay {
+            width: 400px;
+            height: 400px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid #fff;
+            pointer-events: none;
         }
     </style>
     <script src="https://unpkg.com/html5-qrcode"></script>
@@ -26,14 +35,10 @@
     </div>
     <script>
         let html5QrcodeScanner;
-        let scanningEnabled = true; // Flag to control scanning
 
         function onScanSuccess(decodedText, decodedResult) {
-            if (scanningEnabled) {
-                scanningEnabled = false; // Disable further scanning
-                // Redirect to the scanned URL
-                window.location.href = decodedText;
-            }
+            // Redirect to the scanned URL
+            window.location.href = decodedText;
         }
 
         function onScanFailure(error) {
