@@ -24,21 +24,6 @@
             border: 5px solid transparent;
             box-sizing: border-box;
         }
-        #modal {
-            display: none;
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            z-index: 1000;
-        }
     </style>
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
@@ -46,14 +31,23 @@
     <div id="qr-reader">
         <div id="overlay"></div>
     </div>
-    <div id="modal">
-        <div>
-            <p id="scanned-text">Scanned text will appear here</p>
-            <button onclick="closeModal()">Close</button>
-        </div>
-    </div>
     <script>
         let html5QrcodeScanner;
+
+        function onScanSuccess(decodedText, decodedResult) {
+            document.getElementById('overlay').style.border = '5px solid green';
+            showPopup(`Scanned text: ${decodedText}`);
+            resetScanner();
+        }
+
+        function showPopup(scannedText) {
+            let popupWindow = window.open("", "_blank", "width=300,height=100");
+            popupWindow.document.write(`<p>${scannedText}</p><button onclick='window.close()'>Close</button>`);
+        }
+
+        function onScanFailure(error) {
+            console.error(`QR Code scanning failed: ${error}`);
+        }
 
         function resetScanner() {
             if (html5QrcodeScanner) {
@@ -81,27 +75,6 @@
             ).catch(err => {
                 console.error(`Error starting QR scanner: ${err}`);
             });
-        }
-
-        function onScanSuccess(decodedText, decodedResult) {
-            console.log(`Scanned text: ${decodedText}`); // Debugging log
-            document.getElementById('overlay').style.border = '5px solid green';
-            document.getElementById('scanned-text').innerText = `Scanned text: ${decodedText}`;
-            showModal();
-        }
-        
-        function onScanFailure(error) {
-            console.error(`QR Code scanning failed: ${error}`);
-        }
-        
-        function showModal() {
-            console.log('Showing modal'); // Debugging log
-            document.getElementById('modal').style.display = 'flex';
-        }
-        
-        function closeModal() {
-            document.getElementById('modal').style.display = 'none';
-            resetScanner();
         }
 
         // Initialize scanner on page load
