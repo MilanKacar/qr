@@ -1,14 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <style>
+        /* Ensure the scanner fills the entire screen */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        #qr-reader {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
-    <div id="qr-reader" style="width:500px; height:500px;"></div>
+    <div id="qr-reader"></div>
 
     <script>
         function onScanSuccess(decodedText, decodedResult) {
             alert(`Scanned text: ${decodedText}`);
+            // Optionally, clear the scanner.
             html5QrcodeScanner.clear();
         }
 
@@ -16,10 +30,13 @@
             // Handle scan failure (optional)
         }
 
-        let html5QrcodeScanner = new Html5Qrcode("qr-reader");
+        let html5QrcodeScanner = new Html5Qrcode("qr-reader", { formatsToSupport: [ 0 ] });
         html5QrcodeScanner.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: 250 },
+            { facingMode: "environment" }, // Use the rear-facing camera
+            {
+                fps: 10,
+                qrbox: { width: "100%", height: "100%" }
+            },
             onScanSuccess,
             onScanFailure
         ).catch(err => {
