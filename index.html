@@ -55,16 +55,6 @@
     <script>
         let html5QrcodeScanner;
 
-        function onScanSuccess(decodedText, decodedResult) {
-            document.getElementById('overlay').style.border = '5px solid green';
-            document.getElementById('scanned-text').innerText = `Scanned text: ${decodedText}`;
-            showModal();
-        }
-
-        function onScanFailure(error) {
-            console.error(`QR Code scanning failed: ${error}`);
-        }
-
         function resetScanner() {
             if (html5QrcodeScanner) {
                 html5QrcodeScanner.clear().then(() => {
@@ -93,10 +83,22 @@
             });
         }
 
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log(`Scanned text: ${decodedText}`); // Debugging log
+            document.getElementById('overlay').style.border = '5px solid green';
+            document.getElementById('scanned-text').innerText = `Scanned text: ${decodedText}`;
+            showModal();
+        }
+        
+        function onScanFailure(error) {
+            console.error(`QR Code scanning failed: ${error}`);
+        }
+        
         function showModal() {
+            console.log('Showing modal'); // Debugging log
             document.getElementById('modal').style.display = 'flex';
         }
-
+        
         function closeModal() {
             document.getElementById('modal').style.display = 'none';
             resetScanner();
