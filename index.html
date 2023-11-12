@@ -97,4 +97,13 @@
             document.getElementById('modal').style.display = 'flex';
         }
 
-        function
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+            resetScanner();
+        }
+
+        // Initialize scanner on page load
+        window.addEventListener('load', startScanner);
+    </script>
+</body>
+</html>
