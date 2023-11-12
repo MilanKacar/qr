@@ -1,10 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <style>
+        /* Full-screen setup for the QR scanner */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: transparent; /* Set the background-color to transparent */
+        }
+        #qr-reader {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background-color: transparent; /* Set the background-color to transparent */
+        }
+        #qr-box-overlay {
+            width: 400px;
+            height: 400px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid #fff;
+            pointer-events: none;
+        }
+    </style>
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
-    <div id="qr-reader"></div>
+    <div id="qr-reader">
+        <div id="qr-box-overlay"></div>
+    </div>
     <script>
         let html5QrcodeScanner;
 
@@ -33,7 +62,7 @@
                 { facingMode: "environment" },
                 {
                     fps: 10,
-                    qrbox : { width: 400, height: 400 }
+                    qrbox: { width: 400, height: 400 }
                 },
                 onScanSuccess,
                 onScanFailure
