@@ -34,34 +34,17 @@
         document.addEventListener('DOMContentLoaded', (event) => {
             const qrCodeReader = new Html5Qrcode("reader");
 
-            // Constraints to open the rear camera in "environment" mode
-            const constraints = {
-                video: {
-                    facingMode: { exact: 'environment' },
+            qrCodeReader.start(
+                { fps: 10, qrbox: 250 },
+                (message) => {
+                    // Handle the scanned QR code message
+                    alert(`Scanned QR Code: ${message}`);
                 },
-            };
-
-            navigator.mediaDevices.getUserMedia(constraints)
-                .then((stream) => {
-                    // Set the camera stream as the source for the QR code scanner
-                    qrCodeReader.setCameraStream(stream);
-
-                    qrCodeReader.start(
-                        { fps: 10, qrbox: 250 },
-                        (message) => {
-                            // Handle the scanned QR code message
-                            alert(`Scanned QR Code: ${message}`);
-                        },
-                        (error) => {
-                            // Handle errors during QR code scanning
-                            console.error(`QR Code scanning error: ${error}`);
-                        }
-                    );
-                })
-                .catch((error) => {
-                    // Handle errors when accessing the camera
-                    console.error(`Error accessing rear camera: ${error}`);
-                });
+                (error) => {
+                    // Handle errors during QR code scanning
+                    console.error(`QR Code scanning error: ${error}`);
+                }
+            );
 
             // Stop the scanner when the user leaves the page
             window.addEventListener('beforeunload', () => {
