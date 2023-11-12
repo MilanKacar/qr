@@ -32,7 +32,15 @@
     <script src="https://raw.githubusercontent.com/mebjas/html5-qrcode/master/minified/html5-qrcode.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
-            const qrCodeReader = new Html5Qrcode("reader");
+
+            let config = {
+              fps: 10,
+              qrbox: {width: 100, height: 100},
+              rememberLastUsedCamera: true,
+              // Only support camera scan type.
+              supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
+            };
+            const qrCodeReader = new Html5Qrcode("reader", config);
 
             qrCodeReader.start(
                 { fps: 10, qrbox: 250 },
