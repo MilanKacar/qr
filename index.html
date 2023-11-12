@@ -43,7 +43,7 @@
             const qrCodeReader = new Html5Qrcode("reader", config);
 
             qrCodeReader.start(
-                { fps: 10, qrbox: 250 },
+                config,
                 (message) => {
                     // Handle the scanned QR code message
                     alert(`Scanned QR Code: ${message}`);
