@@ -3,53 +3,60 @@
 <head>
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
-<body>
-    <div id="qr-reader">
-        <div id="qr-box-overlay"></div>
+  <body>
+    <div id="qr-reader" style="width: 100%; height: 100%">
+      <div id="qr-box-overlay"></div>
     </div>
     <script>
-        let html5QrcodeScanner;
-        let scanningEnabled = true; // Flag to control scanning
+      let html5QrcodeScanner;
+      let scanningEnabled = true; // Flag to control scanning
 
-        function onScanSuccess(decodedText, decodedResult) {
-            if (scanningEnabled) {
-                scanningEnabled = false; // Disable further scanning
-                // Redirect to the scanned URL
-                window.location.href = decodedText.concat('&API_KEY=4a940fa92292facc178cc905ad6af77e');
-            }
+      function onScanSuccess(decodedText, decodedResult) {
+        if (scanningEnabled) {
+          scanningEnabled = false; // Disable further scanning
+          // Redirect to the scanned URL
+          window.location.href = decodedText.concat(
+            "&API_KEY=4a940fa92292facc178cc905ad6af77e"
+          );
         }
+      }
 
-        function onScanFailure(error) {
-            console.error(`QR Code scanning failed: ${error}`);
-        }
+      function onScanFailure(error) {
+        console.error(`QR Code scanning failed: ${error}`);
+      }
 
-        function resetScanner() {
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.clear().then(() => {
-                    startScanner();
-                }).catch(err => {
-                    console.error(`Failed to clear the QR Scanner: ${err}`);
-                });
-            }
-        }
-
-        function startScanner() {
-            html5QrcodeScanner = new Html5Qrcode("qr-reader");
-            html5QrcodeScanner.start(
-                { facingMode: "environment" },
-                {
-                    fps: 10,
-                    qrbox: { width: 400, height: 400 }
-                },
-                onScanSuccess,
-                onScanFailure
-            ).catch(err => {
-                console.error(`Error starting QR scanner: ${err}`);
+      function resetScanner() {
+        if (html5QrcodeScanner) {
+          html5QrcodeScanner
+            .clear()
+            .then(() => {
+              startScanner();
+            })
+            .catch((err) => {
+              console.error(`Failed to clear the QR Scanner: ${err}`);
             });
         }
+      }
 
-        // Initialize scanner on page load
-        window.addEventListener('load', startScanner);
+      function startScanner() {
+        html5QrcodeScanner = new Html5Qrcode("qr-reader");
+        html5QrcodeScanner
+          .start(
+            { facingMode: "environment" },
+            {
+              fps: 30,
+              qrbox: { width: "80%", height: "80%" }, // Ensuring a 1:1 aspect ratio
+            },
+            onScanSuccess,
+            onScanFailure
+          )
+          .catch((err) => {
+            console.error(`Error starting QR scanner: ${err}`);
+          });
+      }
+
+      // Initialize scanner on page load
+      window.addEventListener("load", startScanner);
     </script>
-</body>
+  </body>
 </html>
