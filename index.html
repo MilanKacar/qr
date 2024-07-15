@@ -43,8 +43,7 @@
               fps: 30,
               qrbox: { width: "30%", height: "30%" }, // Ensuring a 1:1 aspect ratio
             },
-            onScanSuccess,
-            onScanFailure
+            onScanSuccess
           )
           .catch((err) => {
             console.error(`Error starting QR scanner: ${err}`);
